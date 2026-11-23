@@ -2,12 +2,25 @@
 import { useState } from 'react'
 import './App.css'
 
+type ApplicationStatus =
+  | 'Beklemede'
+  | 'Mülakat'
+  | 'Kabul Edildi'
+  | 'Reddedildi'
+
 type Application = {
   id: string
   company: string
   position: string
-  status: 'Beklemede'
+  status: ApplicationStatus
 }
+
+const statuses: ApplicationStatus[] = [
+  'Beklemede',
+  'Mülakat',
+  'Kabul Edildi',
+  'Reddedildi',
+]
 
 function App() {
   const [company, setCompany] = useState('')
@@ -34,6 +47,16 @@ function App() {
     setCompany('')
     setPosition('')
     setError('')
+  }
+
+  function updateStatus(id: string, status: ApplicationStatus) {
+    setApplications((previous) =>
+      previous.map((application) =>
+        application.id === id
+          ? { ...application, status }
+          : application
+      )
+    )
   }
 
   return (
@@ -84,7 +107,29 @@ function App() {
                   <h3>{application.company}</h3>
                   <p>{application.position}</p>
                 </div>
-                <span className="status">{application.status}</span>
+
+                <div className="status-control">
+                  <label htmlFor={`status-${application.id}`}>
+                    Başvuru Durumu
+                  </label>
+
+                  <select
+                    id={`status-${application.id}`}
+                    value={application.status}
+                    onChange={(event) =>
+                      updateStatus(
+                        application.id,
+                        event.target.value as ApplicationStatus
+                      )
+                    }
+                  >
+                    {statuses.map((status) => (
+                      <option key={status} value={status}>
+                        {status}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </li>
             ))}
           </ul>
